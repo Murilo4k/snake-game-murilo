@@ -11,6 +11,11 @@
     --bg-main: #111;
     --cyan: #00ffff;
     --pink: #ff0055;
+    --panel: rgba(255, 255, 255, 0.06);
+}
+
+* {
+    box-sizing: border-box;
 }
 
 body {
@@ -22,27 +27,40 @@ body {
     background: radial-gradient(circle at 50% 20%, #1a1a1a, #090909 75%);
     font-family: Arial, sans-serif;
     color: white;
-    flex-direction: column;
+    padding: 14px;
 }
 
-h1 { margin-bottom: 10px; }
+.app-layout {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+}
+
+.game-area {
+    text-align: center;
+}
+
+h1 {
+    margin: 0 0 10px 0;
+}
 
 .game-container {
     position: relative;
-    text-align: center;
     width: 100%;
     max-width: 460px;
 }
 
 canvas {
     background:
-        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px),
-        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
         #000;
     background-size: 20px 20px;
     border: 3px solid var(--cyan);
     border-radius: 8px;
     box-shadow: 0 0 20px var(--cyan);
+    width: 400px;
+    height: 400px;
     max-width: 90vw;
 }
 
@@ -56,7 +74,7 @@ canvas {
     color: #9dffe8;
 }
 
-.start-screen, .game-over, .pause-screen, .countdown, .level-up {
+.start-screen, .game-over, .pause-screen, .countdown, .level-up, .nickname-modal {
     position: absolute;
     width: 100%;
     height: 100%;
@@ -64,6 +82,8 @@ canvas {
     justify-content: center;
     align-items: center;
     flex-direction: column;
+    padding: 12px;
+    text-align: center;
 }
 
 .start-screen {
@@ -113,6 +133,39 @@ canvas {
     animation: levelUpSlide 0.95s ease;
 }
 
+.nickname-modal {
+    display: none;
+    background: rgba(0, 0, 0, 0.92);
+    z-index: 40;
+}
+
+.nickname-card {
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    padding: 18px;
+    width: 88%;
+    max-width: 320px;
+}
+
+.nickname-card input, .start-screen select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    background: rgba(0, 0, 0, 0.35);
+    color: white;
+    margin-top: 6px;
+    margin-bottom: 10px;
+}
+
+.start-screen .control-row {
+    width: 92%;
+    max-width: 280px;
+    text-align: left;
+    margin: 4px 0;
+}
+
 button {
     border: none;
     border-radius: 10px;
@@ -132,9 +185,20 @@ button:hover {
     top: 8px;
     right: 8px;
     z-index: 20;
+    display: flex;
+    gap: 6px;
 }
 
-#muteButton {
+#quickRestart {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    z-index: 20;
+    font-size: 12px;
+    padding: 7px 10px;
+}
+
+#muteButton, #fullscreenBtn {
     font-size: 12px;
     padding: 7px 10px;
 }
@@ -154,6 +218,49 @@ button:hover {
     width: 60px;
     height: 60px;
     font-size: 24px;
+}
+
+.leaderboard {
+    width: 240px;
+    background: var(--panel);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 12px;
+    padding: 12px;
+    backdrop-filter: blur(5px);
+}
+
+.leaderboard h2 {
+    margin: 0 0 6px 0;
+    font-size: 18px;
+}
+
+.leaderboard small {
+    color: #c0c0c0;
+}
+
+.leaderboard ol {
+    margin: 10px 0;
+    padding-left: 20px;
+    max-height: 360px;
+    overflow: auto;
+}
+
+.leaderboard li {
+    margin-bottom: 8px;
+}
+
+.nick-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+}
+
+.current-player {
+    margin-top: 8px;
+    border-top: 1px solid rgba(255, 255, 255, 0.16);
+    padding-top: 8px;
+    font-size: 14px;
 }
 
 @keyframes flashEffect {
@@ -183,6 +290,17 @@ button:hover {
     100% { opacity: 0; transform: translateY(10px); }
 }
 
+@media (max-width: 900px) {
+    .app-layout {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .leaderboard {
+        width: min(460px, 90vw);
+    }
+}
+
 @media (max-width: 600px) {
     .mobile-controls { display: flex; }
 }
@@ -190,46 +308,92 @@ button:hover {
 </head>
 <body>
 
-<h1>Snake Game Pro</h1>
+<div class="app-layout">
+    <section class="game-area">
+        <h1>Snake Game Pro</h1>
 
-<div class="game-container" id="gameContainer">
-    <div class="top-controls">
-        <button id="muteButton">SOM: ON</button>
-    </div>
+        <div class="game-container" id="gameContainer">
+            <button id="quickRestart" title="Reiniciar agora (R)">Restart</button>
 
-    <div class="score">Score: <span id="score">0</span></div>
-    <div class="score">High Score: <span id="highScore">0</span></div>
-    <div class="score">Level: <span id="level">1</span></div>
+            <div class="top-controls">
+                <button id="fullscreenBtn" title="Tela cheia">FULL</button>
+                <button id="muteButton">SOM: ON</button>
+            </div>
 
-    <div class="start-screen" id="startScreen">
-        <h2>Snake Game</h2>
-        <p>Setas para mover | P para pausar</p>
-        <button id="startButton">Start Game</button>
-    </div>
+            <div class="score">Score: <span id="score">0</span></div>
+            <div class="score">High Score: <span id="highScore">0</span></div>
+            <div class="score">Level: <span id="level">1</span></div>
 
-    <div class="pause-screen" id="pauseScreen">
-        <h2>PAUSED</h2>
-        <p>Pressione P para continuar</p>
-    </div>
+            <div class="start-screen" id="startScreen">
+                <h2>Snake Game</h2>
+                <p>Setas para mover | P pausa | R reinicia</p>
 
-    <div class="game-over" id="gameOver">
-        <h2>Game Over</h2>
-        <button id="restartButton">Restart</button>
-    </div>
+                <div class="control-row">
+                    <label for="difficultySelect">Dificuldade</label>
+                    <select id="difficultySelect">
+                        <option value="easy">Easy</option>
+                        <option value="normal" selected>Normal</option>
+                        <option value="hard">Hard</option>
+                    </select>
+                </div>
 
-    <div class="countdown" id="countdown"></div>
-    <div class="level-up" id="levelUpFx">LEVEL UP!</div>
+                <div class="control-row">
+                    <label for="skinSelect">Skin da Cobra</label>
+                    <select id="skinSelect">
+                        <option value="neon" selected>Neon</option>
+                        <option value="sunset">Sunset</option>
+                        <option value="matrix">Matrix</option>
+                    </select>
+                </div>
 
-    <canvas id="gameCanvas" width="400" height="400"></canvas>
+                <button id="startButton">Start Game</button>
+            </div>
 
-    <div class="mobile-controls">
-        <button id="mobileUp">&uarr;</button>
-        <div>
-            <button id="mobileLeft">&larr;</button>
-            <button id="mobileDown">&darr;</button>
-            <button id="mobileRight">&rarr;</button>
+            <div class="pause-screen" id="pauseScreen">
+                <h2>PAUSED</h2>
+                <p>Pressione P para continuar</p>
+            </div>
+
+            <div class="game-over" id="gameOver">
+                <h2>Game Over</h2>
+                <button id="restartButton">Restart</button>
+            </div>
+
+            <div class="countdown" id="countdown"></div>
+            <div class="level-up" id="levelUpFx">LEVEL UP!</div>
+
+            <div class="nickname-modal" id="nicknameModal">
+                <div class="nickname-card">
+                    <h3>Escolha seu nickname</h3>
+                    <input id="nicknameInput" maxlength="12" placeholder="Ex: Player01">
+                    <button id="saveNicknameBtn">Salvar</button>
+                </div>
+            </div>
+
+            <canvas id="gameCanvas" width="400" height="400"></canvas>
+
+            <div class="mobile-controls">
+                <button id="mobileUp">&uarr;</button>
+                <div>
+                    <button id="mobileLeft">&larr;</button>
+                    <button id="mobileDown">&darr;</button>
+                    <button id="mobileRight">&rarr;</button>
+                </div>
+            </div>
         </div>
-    </div>
+    </section>
+
+    <aside class="leaderboard">
+        <h2>Ranking</h2>
+        <small>Maior para menor pontuacao</small>
+        <ol id="leaderboardList"></ol>
+        <div class="current-player">
+            <div class="nick-line">
+                <span>Nick: <strong id="currentNick">-</strong></span>
+                <button id="changeNickBtn">Alterar</button>
+            </div>
+        </div>
+    </aside>
 </div>
 
 <audio id="bgMusic" src="arcade.mp3" loop></audio>
@@ -249,6 +413,16 @@ const gameOverScreen = document.getElementById("gameOver");
 const countdownEl = document.getElementById("countdown");
 const levelUpFxEl = document.getElementById("levelUpFx");
 const muteButton = document.getElementById("muteButton");
+const fullscreenBtn = document.getElementById("fullscreenBtn");
+const quickRestartBtn = document.getElementById("quickRestart");
+const difficultySelect = document.getElementById("difficultySelect");
+const skinSelect = document.getElementById("skinSelect");
+const nicknameModal = document.getElementById("nicknameModal");
+const nicknameInput = document.getElementById("nicknameInput");
+const saveNicknameBtn = document.getElementById("saveNicknameBtn");
+const currentNickEl = document.getElementById("currentNick");
+const leaderboardList = document.getElementById("leaderboardList");
+const changeNickBtn = document.getElementById("changeNickBtn");
 
 const bgMusic = document.getElementById("bgMusic");
 const eatSound = document.getElementById("eatSound");
@@ -258,9 +432,6 @@ const deathSound = document.getElementById("deathSound");
 const box = 20;
 const canvasSize = 400;
 const gridCount = canvasSize / box;
-const snakeHeadColor = "#00ffcc";
-const snakeBodyColor = "#00aa88";
-
 const STATE = {
     MENU: "menu",
     COUNTDOWN: "countdown",
@@ -269,24 +440,42 @@ const STATE = {
     GAME_OVER: "game-over"
 };
 
+const DIFFICULTY_CONFIG = {
+    easy: { startSpeed: 175, speedDrop: 4, minSpeed: 78, levelStep: 6, obstacleBase: 0 },
+    normal: { startSpeed: 150, speedDrop: 6, minSpeed: 65, levelStep: 5, obstacleBase: 1 },
+    hard: { startSpeed: 130, speedDrop: 8, minSpeed: 52, levelStep: 4, obstacleBase: 2 }
+};
+
+const SKINS = {
+    neon: { head: "#00ffcc", body: "#00aa88", glowHead: "#00ffcc", glowBody: "#00aa88" },
+    sunset: { head: "#ffb703", body: "#fb8500", glowHead: "#ffd166", glowBody: "#fb8500" },
+    matrix: { head: "#98ff98", body: "#2ea043", glowHead: "#98ff98", glowBody: "#2ea043" }
+};
+
 let state = STATE.MENU;
 let snake = [];
 let direction = "RIGHT";
 let queuedDirection = "RIGHT";
 let food = null;
 let specialFood = null;
-let specialFoodTimeout = null;
-let specialFoodExpireAt = 0;
-let specialFoodRemaining = 0;
+let obstacles = [];
 let particles = [];
 let floatingTexts = [];
 
+let specialFoodTimeout = null;
+let specialFoodExpireAt = 0;
+let specialFoodRemaining = 0;
+
 let score = 0;
 let level = 1;
-let speed = 150;
-let nextLevelScore = 5;
+let speed = DIFFICULTY_CONFIG.normal.startSpeed;
+let nextLevelScore = DIFFICULTY_CONFIG.normal.levelStep;
 let gameInterval = null;
 
+let selectedDifficulty = "normal";
+let selectedSkin = "neon";
+let playerNick = localStorage.getItem("snakeNickname") || "";
+let leaderboard = loadLeaderboard();
 let soundEnabled = JSON.parse(localStorage.getItem("snakeSoundEnabled") ?? "true");
 let highScore = Number(localStorage.getItem("snakeHighScore") || 0);
 
@@ -296,9 +485,14 @@ specialSound.volume = 0.55;
 deathSound.volume = 0.7;
 highScoreEl.innerText = highScore;
 updateSoundButton();
+renderLeaderboard();
+updatePlayerNickUI();
+
+if (!playerNick) {
+    openNickModal();
+}
 
 let audioCtx = null;
-
 function ensureAudioContext() {
     if (!audioCtx) {
         const AudioCtx = window.AudioContext || window.webkitAudioContext;
@@ -363,6 +557,87 @@ function updateSoundButton() {
     muteButton.innerText = soundEnabled ? "SOM: ON" : "SOM: OFF";
 }
 
+function loadLeaderboard() {
+    try {
+        return JSON.parse(localStorage.getItem("snakeLeaderboard") || "[]");
+    } catch {
+        return [];
+    }
+}
+
+function persistLeaderboard() {
+    localStorage.setItem("snakeLeaderboard", JSON.stringify(leaderboard));
+}
+
+function renderLeaderboard() {
+    leaderboardList.innerHTML = "";
+    const sorted = [...leaderboard].sort((a, b) => b.score - a.score);
+
+    if (!sorted.length) {
+        const li = document.createElement("li");
+        li.textContent = "Sem pontuacoes ainda";
+        leaderboardList.appendChild(li);
+        return;
+    }
+
+    sorted.slice(0, 15).forEach((entry) => {
+        const li = document.createElement("li");
+        li.textContent = entry.nick + " - " + entry.score;
+        leaderboardList.appendChild(li);
+    });
+}
+
+function updateLeaderboardForPlayer(finalScore) {
+    if (!playerNick) return;
+    const nickKey = playerNick.trim().toLowerCase();
+    const existing = leaderboard.find((entry) => entry.nickKey === nickKey);
+
+    if (!existing) {
+        leaderboard.push({ nick: playerNick, nickKey, score: finalScore });
+    } else if (finalScore > existing.score) {
+        existing.score = finalScore;
+        existing.nick = playerNick;
+    }
+
+    persistLeaderboard();
+    renderLeaderboard();
+}
+
+function updatePlayerNickUI() {
+    currentNickEl.textContent = playerNick || "-";
+}
+
+function openNickModal() {
+    nicknameModal.style.display = "flex";
+    nicknameInput.value = playerNick;
+    setTimeout(() => nicknameInput.focus(), 10);
+}
+
+function closeNickModal() {
+    nicknameModal.style.display = "none";
+}
+
+function saveNickname() {
+    const value = nicknameInput.value.trim();
+    if (!/^[a-zA-Z0-9_]{2,12}$/.test(value)) {
+        alert("Nickname: use 2 a 12 caracteres (letras, numeros ou _).");
+        return;
+    }
+
+    playerNick = value;
+    localStorage.setItem("snakeNickname", playerNick);
+    updatePlayerNickUI();
+    closeNickModal();
+}
+
+function currentDifficultyConfig() {
+    return DIFFICULTY_CONFIG[selectedDifficulty];
+}
+
+function currentSkin() {
+    return SKINS[selectedSkin];
+}
+
 function randomCell() {
     return {
         x: Math.floor(Math.random() * gridCount) * box,
@@ -370,17 +645,22 @@ function randomCell() {
     };
 }
 
-function isOccupied(pos, includeFood = true, includeSpecial = true) {
-    const onSnake = snake.some((segment) => segment.x === pos.x && segment.y === pos.y);
-    const onFood = includeFood && food && food.x === pos.x && food.y === pos.y;
-    const onSpecial = includeSpecial && specialFood && specialFood.x === pos.x && specialFood.y === pos.y;
-    return onSnake || onFood || onSpecial;
+function isSamePos(a, b) {
+    return a.x === b.x && a.y === b.y;
+}
+
+function isOccupied(pos, options = { snake: true, food: true, special: true, obstacles: true }) {
+    const onSnake = options.snake && snake.some((segment) => isSamePos(segment, pos));
+    const onFood = options.food && food && isSamePos(food, pos);
+    const onSpecial = options.special && specialFood && isSamePos(specialFood, pos);
+    const onObstacle = options.obstacles && obstacles.some((obs) => isSamePos(obs, pos));
+    return onSnake || onFood || onSpecial || onObstacle;
 }
 
 function spawnFood() {
     let newFood = randomCell();
     let tries = 0;
-    while (isOccupied(newFood, false, true) && tries < 200) {
+    while (isOccupied(newFood, { snake: true, food: false, special: true, obstacles: true }) && tries < 300) {
         newFood = randomCell();
         tries++;
     }
@@ -391,7 +671,7 @@ function spawnSpecialFood(duration = 6000) {
     if (specialFood) return;
     let newSpecial = randomCell();
     let tries = 0;
-    while (isOccupied(newSpecial, true, false) && tries < 200) {
+    while (isOccupied(newSpecial, { snake: true, food: true, special: false, obstacles: true }) && tries < 300) {
         newSpecial = randomCell();
         tries++;
     }
@@ -438,6 +718,22 @@ function resumeSpecialTimer() {
     if (!specialFood) return;
     const duration = specialFoodRemaining || 1000;
     startSpecialTimer(duration);
+}
+
+function spawnObstaclesForLevel() {
+    const config = currentDifficultyConfig();
+    const count = Math.max(0, config.obstacleBase + Math.floor((level - 1) / 2));
+    obstacles = [];
+
+    for (let i = 0; i < count; i++) {
+        let obs = randomCell();
+        let tries = 0;
+        while (isOccupied(obs, { snake: true, food: true, special: true, obstacles: true }) && tries < 300) {
+            obs = randomCell();
+            tries++;
+        }
+        obstacles.push(obs);
+    }
 }
 
 function addParticles(x, y, color, count = 10) {
@@ -487,17 +783,20 @@ function shakeCanvas() {
 }
 
 function resetGameState() {
+    const config = currentDifficultyConfig();
     snake = [{ x: 200, y: 200 }];
     direction = "RIGHT";
     queuedDirection = "RIGHT";
     score = 0;
     level = 1;
-    speed = 150;
-    nextLevelScore = 5;
+    speed = config.startSpeed;
+    nextLevelScore = config.levelStep;
     particles = [];
     floatingTexts = [];
+    obstacles = [];
     clearSpecialFood();
     spawnFood();
+    spawnObstaclesForLevel();
 
     scoreEl.innerText = score;
     levelEl.innerText = level;
@@ -519,6 +818,12 @@ function startLoop() {
 }
 
 function startGame() {
+    if (!playerNick) {
+        openNickModal();
+        return;
+    }
+    selectedDifficulty = difficultySelect.value;
+    selectedSkin = skinSelect.value;
     ensureAudioContext();
     startScreen.style.display = "none";
     state = STATE.COUNTDOWN;
@@ -527,6 +832,8 @@ function startGame() {
 }
 
 function restartGame() {
+    selectedDifficulty = difficultySelect.value;
+    selectedSkin = skinSelect.value;
     state = STATE.COUNTDOWN;
     resetGameState();
     startCountdown(3);
@@ -603,6 +910,7 @@ function gameOver() {
     document.body.classList.add("flash");
     setTimeout(() => document.body.classList.remove("flash"), 300);
     gameOverScreen.style.display = "flex";
+    updateLeaderboardForPlayer(score);
 }
 
 function updateEffects() {
@@ -665,11 +973,22 @@ function drawFood() {
     }
 }
 
+function drawObstacles() {
+    for (const obs of obstacles) {
+        ctx.fillStyle = "#6f7586";
+        ctx.shadowColor = "#a4abc2";
+        ctx.shadowBlur = 6;
+        ctx.fillRect(obs.x + 2, obs.y + 2, box - 4, box - 4);
+    }
+    ctx.shadowBlur = 0;
+}
+
 function drawSnake() {
+    const skin = currentSkin();
     for (let i = 0; i < snake.length; i++) {
         const isHead = i === 0;
-        ctx.fillStyle = isHead ? snakeHeadColor : snakeBodyColor;
-        ctx.shadowColor = isHead ? "#00ffcc" : "#00aa88";
+        ctx.fillStyle = isHead ? skin.head : skin.body;
+        ctx.shadowColor = isHead ? skin.glowHead : skin.glowBody;
         ctx.shadowBlur = isHead ? 18 : 10;
         ctx.fillRect(snake[i].x + 1, snake[i].y + 1, box - 2, box - 2);
     }
@@ -679,12 +998,14 @@ function drawSnake() {
 function render() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawFood();
+    drawObstacles();
     drawSnake();
     drawEffects();
 }
 
 function gameTick() {
     if (state !== STATE.PLAYING) return;
+    const config = currentDifficultyConfig();
 
     direction = queuedDirection;
     let headX = snake[0].x;
@@ -695,20 +1016,20 @@ function gameTick() {
     if (direction === "UP") headY -= box;
     if (direction === "DOWN") headY += box;
 
-    const ateFood = food && headX === food.x && headY === food.y;
-    const ateSpecial = specialFood && headX === specialFood.x && headY === specialFood.y;
+    const nextPos = { x: headX, y: headY };
+    const ateFood = food && isSamePos(nextPos, food);
+    const ateSpecial = specialFood && isSamePos(nextPos, specialFood);
     const willGrow = ateFood || ateSpecial;
     const bodyForCollision = willGrow ? snake : snake.slice(0, -1);
-    const hitSelf = bodyForCollision.some((segment) => segment.x === headX && segment.y === headY);
+    const hitSelf = bodyForCollision.some((segment) => isSamePos(segment, nextPos));
     const hitWall = headX < 0 || headY < 0 || headX >= canvasSize || headY >= canvasSize;
+    const hitObstacle = obstacles.some((obs) => isSamePos(obs, nextPos));
 
-    if (hitSelf || hitWall) {
+    if (hitSelf || hitWall || hitObstacle) {
         gameOver();
         render();
         return;
     }
-
-    const newHead = { x: headX, y: headY };
 
     if (ateFood) {
         score += 1;
@@ -729,14 +1050,15 @@ function gameTick() {
         snake.pop();
     }
 
-    snake.unshift(newHead);
+    snake.unshift(nextPos);
     scoreEl.innerText = score;
 
     if (score >= nextLevelScore) {
         level++;
-        nextLevelScore += 5;
-        speed = Math.max(65, speed - 6);
+        nextLevelScore += config.levelStep;
+        speed = Math.max(config.minSpeed, speed - config.speedDrop);
         levelEl.innerText = level;
+        spawnObstaclesForLevel();
         showLevelUpFX();
         playLevelUpFX();
         shakeCanvas();
@@ -753,8 +1075,24 @@ function gameTick() {
     render();
 }
 
+function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+    } else {
+        document.exitFullscreen().catch(() => {});
+    }
+}
+
 document.getElementById("startButton").addEventListener("click", startGame);
 document.getElementById("restartButton").addEventListener("click", restartGame);
+quickRestartBtn.addEventListener("click", restartGame);
+fullscreenBtn.addEventListener("click", toggleFullscreen);
+saveNicknameBtn.addEventListener("click", saveNickname);
+changeNickBtn.addEventListener("click", openNickModal);
+
+nicknameInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") saveNickname();
+});
 
 document.addEventListener("keydown", (event) => {
     switch (event.key) {
@@ -773,6 +1111,10 @@ document.addEventListener("keydown", (event) => {
         case "p":
         case "P":
             togglePause();
+            break;
+        case "r":
+        case "R":
+            restartGame();
             break;
     }
 });
