@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -14,9 +13,7 @@
     --panel: rgba(255, 255, 255, 0.06);
 }
 
-* {
-    box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
     margin: 0;
@@ -30,19 +27,9 @@ body {
     padding: 14px;
 }
 
-.app-layout {
-    display: flex;
-    gap: 16px;
-    align-items: flex-start;
-}
-
-.game-area {
-    text-align: center;
-}
-
-h1 {
-    margin: 0 0 10px 0;
-}
+.app-layout { display: flex; gap: 16px; align-items: flex-start; }
+.game-area { text-align: center; }
+h1 { margin: 0 0 10px 0; }
 
 .game-container {
     position: relative;
@@ -68,11 +55,7 @@ canvas {
     margin: 6px 0;
     transition: transform 0.18s ease, color 0.18s ease;
 }
-
-.score-pop {
-    transform: scale(1.08);
-    color: #9dffe8;
-}
+.score-pop { transform: scale(1.08); color: #9dffe8; }
 
 .start-screen, .game-over, .pause-screen, .countdown, .level-up, .nickname-modal {
     position: absolute;
@@ -86,9 +69,7 @@ canvas {
     text-align: center;
 }
 
-.start-screen {
-    background: rgba(0, 0, 0, 0.9);
-}
+.start-screen { background: rgba(0, 0, 0, 0.9); }
 
 .game-over {
     display: none;
@@ -112,7 +93,6 @@ canvas {
     text-shadow: 0 0 20px var(--cyan);
     pointer-events: none;
 }
-
 .countdown.show {
     display: flex;
     animation: countdownPulse 0.85s ease;
@@ -127,7 +107,6 @@ canvas {
     color: #ffe36e;
     text-shadow: 0 0 12px #ffe36e;
 }
-
 .level-up.show {
     display: flex;
     animation: levelUpSlide 0.95s ease;
@@ -175,10 +154,7 @@ button {
     padding: 10px 14px;
     cursor: pointer;
 }
-
-button:hover {
-    filter: brightness(1.08);
-}
+button:hover { filter: brightness(1.08); }
 
 .top-controls {
     position: absolute;
@@ -197,7 +173,6 @@ button:hover {
     font-size: 12px;
     padding: 7px 10px;
 }
-
 #muteButton, #fullscreenBtn {
     font-size: 12px;
     padding: 7px 10px;
@@ -213,7 +188,6 @@ button:hover {
     align-items: center;
     gap: 6px;
 }
-
 .mobile-controls button {
     width: 60px;
     height: 60px;
@@ -228,26 +202,15 @@ button:hover {
     padding: 12px;
     backdrop-filter: blur(5px);
 }
-
-.leaderboard h2 {
-    margin: 0 0 6px 0;
-    font-size: 18px;
-}
-
-.leaderboard small {
-    color: #c0c0c0;
-}
-
+.leaderboard h2 { margin: 0 0 6px 0; font-size: 18px; }
+.leaderboard small { color: #c0c0c0; }
 .leaderboard ol {
     margin: 10px 0;
     padding-left: 20px;
     max-height: 360px;
     overflow: auto;
 }
-
-.leaderboard li {
-    margin-bottom: 8px;
-}
+.leaderboard li { margin-bottom: 8px; }
 
 .nick-line {
     display: flex;
@@ -255,7 +218,6 @@ button:hover {
     align-items: center;
     gap: 8px;
 }
-
 .current-player {
     margin-top: 8px;
     border-top: 1px solid rgba(255, 255, 255, 0.16);
@@ -268,7 +230,6 @@ button:hover {
     50% { background: #ff0000; }
     100% { background: var(--bg-main); }
 }
-
 @keyframes shakeEffect {
     0% { transform: translateX(0); }
     20% { transform: translateX(-7px); }
@@ -277,13 +238,11 @@ button:hover {
     80% { transform: translateX(5px); }
     100% { transform: translateX(0); }
 }
-
 @keyframes countdownPulse {
     0% { opacity: 0.2; transform: scale(0.7); }
     45% { opacity: 1; transform: scale(1.08); }
     100% { opacity: 0; transform: scale(1.35); }
 }
-
 @keyframes levelUpSlide {
     0% { opacity: 0; transform: translateY(-26px); }
     35% { opacity: 1; transform: translateY(0); }
@@ -291,16 +250,9 @@ button:hover {
 }
 
 @media (max-width: 900px) {
-    .app-layout {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .leaderboard {
-        width: min(460px, 90vw);
-    }
+    .app-layout { flex-direction: column; align-items: center; }
+    .leaderboard { width: min(460px, 90vw); }
 }
-
 @media (max-width: 600px) {
     .mobile-controls { display: flex; }
 }
@@ -385,7 +337,7 @@ button:hover {
 
     <aside class="leaderboard">
         <h2>Ranking</h2>
-        <small>Maior para menor pontuacao</small>
+        <small id="leaderboardModeText">Maior para menor pontuacao (local)</small>
         <ol id="leaderboardList"></ol>
         <div class="current-player">
             <div class="nick-line">
@@ -423,6 +375,7 @@ const saveNicknameBtn = document.getElementById("saveNicknameBtn");
 const currentNickEl = document.getElementById("currentNick");
 const leaderboardList = document.getElementById("leaderboardList");
 const changeNickBtn = document.getElementById("changeNickBtn");
+const leaderboardModeText = document.getElementById("leaderboardModeText");
 
 const bgMusic = document.getElementById("bgMusic");
 const eatSound = document.getElementById("eatSound");
@@ -452,6 +405,11 @@ const SKINS = {
     matrix: { head: "#98ff98", body: "#2ea043", glowHead: "#98ff98", glowBody: "#2ea043" }
 };
 
+const ONLINE_RANKING_ENABLED = true;
+const SUPABASE_URL = "COLE_AQUI_SEU_PROJECT_URL";
+const SUPABASE_ANON_KEY = "COLE_AQUI_SUA_PUBLISHABLE_KEY";
+const SUPABASE_TABLE = "snake_scores";
+
 let state = STATE.MENU;
 let snake = [];
 let direction = "RIGHT";
@@ -475,7 +433,7 @@ let gameInterval = null;
 let selectedDifficulty = "normal";
 let selectedSkin = "neon";
 let playerNick = localStorage.getItem("snakeNickname") || "";
-let leaderboard = loadLeaderboard();
+let leaderboard = loadLocalLeaderboard();
 let soundEnabled = JSON.parse(localStorage.getItem("snakeSoundEnabled") ?? "true");
 let highScore = Number(localStorage.getItem("snakeHighScore") || 0);
 
@@ -487,12 +445,13 @@ highScoreEl.innerText = highScore;
 updateSoundButton();
 renderLeaderboard();
 updatePlayerNickUI();
+updateLeaderboardModeUI();
 
-if (!playerNick) {
-    openNickModal();
-}
+if (!playerNick) openNickModal();
+initLeaderboard();
 
 let audioCtx = null;
+
 function ensureAudioContext() {
     if (!audioCtx) {
         const AudioCtx = window.AudioContext || window.webkitAudioContext;
@@ -505,7 +464,6 @@ function playSynth(freq, duration, type = "sine", volume = 0.035) {
     if (!soundEnabled) return;
     ensureAudioContext();
     if (!audioCtx) return;
-
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
     osc.type = type;
@@ -513,7 +471,6 @@ function playSynth(freq, duration, type = "sine", volume = 0.035) {
     gain.gain.value = volume;
     osc.connect(gain);
     gain.connect(audioCtx.destination);
-
     const now = audioCtx.currentTime;
     gain.gain.setValueAtTime(volume, now);
     gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
@@ -527,59 +484,85 @@ function safePlay(audio) {
     audio.play().catch(() => {});
 }
 
-function playEatFX() {
-    safePlay(eatSound);
-    playSynth(450, 0.08, "square", 0.025);
+function playEatFX() { safePlay(eatSound); playSynth(450, 0.08, "square", 0.025); }
+function playSpecialFX() { safePlay(specialSound); playSynth(320, 0.08, "triangle", 0.03); setTimeout(() => playSynth(680, 0.12, "triangle", 0.02), 70); }
+function playLevelUpFX() { playSynth(520, 0.08, "square", 0.025); setTimeout(() => playSynth(700, 0.12, "square", 0.022), 90); }
+function playCountdownFX() { playSynth(260, 0.07, "sine", 0.02); }
+function playDeathFX() { safePlay(deathSound); playSynth(240, 0.15, "sawtooth", 0.03); setTimeout(() => playSynth(130, 0.2, "sawtooth", 0.03), 120); }
+
+function updateSoundButton() { muteButton.innerText = soundEnabled ? "SOM: ON" : "SOM: OFF"; }
+
+function isOnlineRankingConfigured() {
+    return ONLINE_RANKING_ENABLED && SUPABASE_URL.startsWith("http") && SUPABASE_ANON_KEY.length > 20;
 }
 
-function playSpecialFX() {
-    safePlay(specialSound);
-    playSynth(320, 0.08, "triangle", 0.03);
-    setTimeout(() => playSynth(680, 0.12, "triangle", 0.02), 70);
+function updateLeaderboardModeUI() {
+    leaderboardModeText.textContent = isOnlineRankingConfigured()
+        ? "Maior para menor pontuacao (online global)"
+        : "Maior para menor pontuacao (local)";
 }
 
-function playLevelUpFX() {
-    playSynth(520, 0.08, "square", 0.025);
-    setTimeout(() => playSynth(700, 0.12, "square", 0.022), 90);
+function loadLocalLeaderboard() {
+    try { return JSON.parse(localStorage.getItem("snakeLeaderboard") || "[]"); }
+    catch { return []; }
 }
 
-function playCountdownFX() {
-    playSynth(260, 0.07, "sine", 0.02);
-}
-
-function playDeathFX() {
-    safePlay(deathSound);
-    playSynth(240, 0.15, "sawtooth", 0.03);
-    setTimeout(() => playSynth(130, 0.2, "sawtooth", 0.03), 120);
-}
-
-function updateSoundButton() {
-    muteButton.innerText = soundEnabled ? "SOM: ON" : "SOM: OFF";
-}
-
-function loadLeaderboard() {
-    try {
-        return JSON.parse(localStorage.getItem("snakeLeaderboard") || "[]");
-    } catch {
-        return [];
-    }
-}
-
-function persistLeaderboard() {
+function persistLocalLeaderboard() {
     localStorage.setItem("snakeLeaderboard", JSON.stringify(leaderboard));
+}
+
+async function supabaseFetch(path, options = {}) {
+    const response = await fetch(`${SUPABASE_URL}${path}`, {
+        ...options,
+        headers: {
+            "apikey": SUPABASE_ANON_KEY,
+            "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
+            "Content-Type": "application/json",
+            ...(options.headers || {})
+        }
+    });
+    if (!response.ok) throw new Error(`Supabase ${response.status}: ${await response.text()}`);
+    if (response.status === 204) return null;
+    return response.json();
+}
+
+async function fetchOnlineLeaderboard() {
+    const data = await supabaseFetch(`/rest/v1/${SUPABASE_TABLE}?select=nick,score&order=score.desc&limit=15`);
+    return Array.isArray(data) ? data : [];
+}
+
+async function fetchOnlineBestByNick(nickKey) {
+    const data = await supabaseFetch(`/rest/v1/${SUPABASE_TABLE}?select=nick,score,nick_key&nick_key=eq.${encodeURIComponent(nickKey)}&limit=1`);
+    return data && data.length ? data[0] : null;
+}
+
+async function upsertOnlineScore(nick, nickKey, scoreValue) {
+    await supabaseFetch(`/rest/v1/${SUPABASE_TABLE}?on_conflict=nick_key`, {
+        method: "POST",
+        headers: { "Prefer": "resolution=merge-duplicates,return=minimal" },
+        body: JSON.stringify([{ nick, nick_key: nickKey, score: scoreValue }])
+    });
+}
+
+async function initLeaderboard() {
+    if (!isOnlineRankingConfigured()) return;
+    try {
+        leaderboard = await fetchOnlineLeaderboard();
+        renderLeaderboard();
+    } catch (error) {
+        console.error("Falha ranking online, usando local.", error);
+    }
 }
 
 function renderLeaderboard() {
     leaderboardList.innerHTML = "";
     const sorted = [...leaderboard].sort((a, b) => b.score - a.score);
-
     if (!sorted.length) {
         const li = document.createElement("li");
         li.textContent = "Sem pontuacoes ainda";
         leaderboardList.appendChild(li);
         return;
     }
-
     sorted.slice(0, 15).forEach((entry) => {
         const li = document.createElement("li");
         li.textContent = entry.nick + " - " + entry.score;
@@ -587,35 +570,38 @@ function renderLeaderboard() {
     });
 }
 
-function updateLeaderboardForPlayer(finalScore) {
+async function updateLeaderboardForPlayer(finalScore) {
     if (!playerNick) return;
     const nickKey = playerNick.trim().toLowerCase();
-    const existing = leaderboard.find((entry) => entry.nickKey === nickKey);
+    const existing = leaderboard.find((entry) => (entry.nickKey || entry.nick_key) === nickKey);
 
-    if (!existing) {
-        leaderboard.push({ nick: playerNick, nickKey, score: finalScore });
-    } else if (finalScore > existing.score) {
-        existing.score = finalScore;
-        existing.nick = playerNick;
-    }
+    if (!existing) leaderboard.push({ nick: playerNick, nickKey, nick_key: nickKey, score: finalScore });
+    else if (finalScore > existing.score) { existing.score = finalScore; existing.nick = playerNick; }
 
-    persistLeaderboard();
+    persistLocalLeaderboard();
     renderLeaderboard();
+
+    if (!isOnlineRankingConfigured()) return;
+
+    try {
+        const onlineBest = await fetchOnlineBestByNick(nickKey);
+        const currentBest = onlineBest ? Number(onlineBest.score || 0) : 0;
+        if (finalScore > currentBest) await upsertOnlineScore(playerNick, nickKey, finalScore);
+        leaderboard = await fetchOnlineLeaderboard();
+        renderLeaderboard();
+    } catch (error) {
+        console.error("Falha ao enviar score online.", error);
+    }
 }
 
-function updatePlayerNickUI() {
-    currentNickEl.textContent = playerNick || "-";
-}
+function updatePlayerNickUI() { currentNickEl.textContent = playerNick || "-"; }
 
 function openNickModal() {
     nicknameModal.style.display = "flex";
     nicknameInput.value = playerNick;
     setTimeout(() => nicknameInput.focus(), 10);
 }
-
-function closeNickModal() {
-    nicknameModal.style.display = "none";
-}
+function closeNickModal() { nicknameModal.style.display = "none"; }
 
 function saveNickname() {
     const value = nicknameInput.value.trim();
@@ -623,31 +609,19 @@ function saveNickname() {
         alert("Nickname: use 2 a 12 caracteres (letras, numeros ou _).");
         return;
     }
-
     playerNick = value;
     localStorage.setItem("snakeNickname", playerNick);
     updatePlayerNickUI();
     closeNickModal();
 }
 
-function currentDifficultyConfig() {
-    return DIFFICULTY_CONFIG[selectedDifficulty];
-}
-
-function currentSkin() {
-    return SKINS[selectedSkin];
-}
+function currentDifficultyConfig() { return DIFFICULTY_CONFIG[selectedDifficulty]; }
+function currentSkin() { return SKINS[selectedSkin]; }
 
 function randomCell() {
-    return {
-        x: Math.floor(Math.random() * gridCount) * box,
-        y: Math.floor(Math.random() * gridCount) * box
-    };
+    return { x: Math.floor(Math.random() * gridCount) * box, y: Math.floor(Math.random() * gridCount) * box };
 }
-
-function isSamePos(a, b) {
-    return a.x === b.x && a.y === b.y;
-}
+function isSamePos(a, b) { return a.x === b.x && a.y === b.y; }
 
 function isOccupied(pos, options = { snake: true, food: true, special: true, obstacles: true }) {
     const onSnake = options.snake && snake.some((segment) => isSamePos(segment, pos));
@@ -681,9 +655,7 @@ function spawnSpecialFood(duration = 6000) {
 }
 
 function maybeSpawnSpecialFood() {
-    if (!specialFood && Math.random() < 0.26) {
-        spawnSpecialFood(6000);
-    }
+    if (!specialFood && Math.random() < 0.26) spawnSpecialFood(6000);
 }
 
 function clearSpecialFood() {
@@ -716,15 +688,13 @@ function pauseSpecialTimer() {
 
 function resumeSpecialTimer() {
     if (!specialFood) return;
-    const duration = specialFoodRemaining || 1000;
-    startSpecialTimer(duration);
+    startSpecialTimer(specialFoodRemaining || 1000);
 }
 
 function spawnObstaclesForLevel() {
     const config = currentDifficultyConfig();
     const count = Math.max(0, config.obstacleBase + Math.floor((level - 1) / 2));
     obstacles = [];
-
     for (let i = 0; i < count; i++) {
         let obs = randomCell();
         let tries = 0;
@@ -751,18 +721,11 @@ function addParticles(x, y, color, count = 10) {
 }
 
 function addFloatingText(x, y, text, color = "#ffffff") {
-    floatingTexts.push({
-        x: x + box / 2,
-        y: y + box / 2,
-        text,
-        color,
-        life: 26
-    });
+    floatingTexts.push({ x: x + box / 2, y: y + box / 2, text, color, life: 26 });
 }
 
 function pulseScoreUI() {
-    const rows = document.querySelectorAll(".score");
-    rows.forEach((row) => {
+    document.querySelectorAll(".score").forEach((row) => {
         row.classList.add("score-pop");
         setTimeout(() => row.classList.remove("score-pop"), 160);
     });
@@ -811,17 +774,13 @@ function stopLoop() {
         gameInterval = null;
     }
 }
-
 function startLoop() {
     stopLoop();
     gameInterval = setInterval(gameTick, speed);
 }
 
 function startGame() {
-    if (!playerNick) {
-        openNickModal();
-        return;
-    }
+    if (!playerNick) return openNickModal();
     selectedDifficulty = difficultySelect.value;
     selectedSkin = skinSelect.value;
     ensureAudioContext();
@@ -860,7 +819,6 @@ function startCountdown(seconds) {
             }, 450);
             return;
         }
-
         countdownEl.innerText = current;
         countdownEl.classList.remove("show");
         void countdownEl.offsetWidth;
@@ -869,20 +827,18 @@ function startCountdown(seconds) {
         current--;
         setTimeout(showStep, 900);
     };
-
     showStep();
 }
 
 function togglePause() {
     if (state === STATE.MENU || state === STATE.COUNTDOWN || state === STATE.GAME_OVER) return;
-
     if (state === STATE.PLAYING) {
         state = STATE.PAUSED;
         stopLoop();
         pauseSpecialTimer();
         bgMusic.pause();
         pauseScreen.style.display = "flex";
-    } else if (state === STATE.PAUSED) {
+    } else {
         state = STATE.PLAYING;
         resumeSpecialTimer();
         if (soundEnabled) bgMusic.play().catch(() => {});
@@ -921,7 +877,6 @@ function updateEffects() {
         p.vy += 0.03;
         p.life -= 1;
     }
-
     floatingTexts = floatingTexts.filter((t) => t.life > 0);
     for (const t of floatingTexts) {
         t.y -= 0.7;
@@ -959,7 +914,6 @@ function drawFood() {
         ctx.fillRect(food.x + 2, food.y + 2, box - 4, box - 4);
         ctx.shadowBlur = 0;
     }
-
     if (specialFood) {
         const pulse = (Math.sin(Date.now() / 140) + 1) * 0.5;
         const glow = 10 + pulse * 10;
@@ -1096,26 +1050,14 @@ nicknameInput.addEventListener("keydown", (event) => {
 
 document.addEventListener("keydown", (event) => {
     switch (event.key) {
-        case "ArrowLeft":
-            setDirection("LEFT");
-            break;
-        case "ArrowRight":
-            setDirection("RIGHT");
-            break;
-        case "ArrowUp":
-            setDirection("UP");
-            break;
-        case "ArrowDown":
-            setDirection("DOWN");
-            break;
+        case "ArrowLeft": setDirection("LEFT"); break;
+        case "ArrowRight": setDirection("RIGHT"); break;
+        case "ArrowUp": setDirection("UP"); break;
+        case "ArrowDown": setDirection("DOWN"); break;
         case "p":
-        case "P":
-            togglePause();
-            break;
+        case "P": togglePause(); break;
         case "r":
-        case "R":
-            restartGame();
-            break;
+        case "R": restartGame(); break;
     }
 });
 
@@ -1137,12 +1079,8 @@ muteButton.addEventListener("click", () => {
     soundEnabled = !soundEnabled;
     localStorage.setItem("snakeSoundEnabled", JSON.stringify(soundEnabled));
     updateSoundButton();
-
-    if (!soundEnabled) {
-        bgMusic.pause();
-    } else if (state === STATE.PLAYING) {
-        bgMusic.play().catch(() => {});
-    }
+    if (!soundEnabled) bgMusic.pause();
+    else if (state === STATE.PLAYING) bgMusic.play().catch(() => {});
 });
 
 render();
@@ -1150,4 +1088,3 @@ render();
 
 </body>
 </html>
-```
